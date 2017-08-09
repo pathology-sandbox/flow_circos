@@ -1,22 +1,27 @@
-
-# Import modules
-source("http://bioconductor.org/biocLite.R")
-biocLite("flowCore")
-biocLite("flowQ")
-biocLite("flowViz")
 library(flowCore)
 library(flowQ)
 library(flowViz)
+library(circlize)
 
-x<- read.FCS('', transformation="linearize", dataset = 1)
+# Functions
 
-f1 = read.FCS('')
-f2 = read.FCS('')
-f3 = read.FCS('')
-f4 = read.FCS('')
+dichotomize <- function(channels, cutoffs){
+  markers <- names(channels)
+  binary_matrix <- list() 
+  for (i in 1:2){
+    binary_matrix[[markers[[i]]]] <- 1 * sapply(channels[[i]], function(x) x > cutoffs[i])
+  }
+  return(binary_matrix)
+}
 
-colnames(f1)# the channel labels
-E = exprs(f1)#the expression values measured for each cell
+
+# User input
+flow_file <- read.FCS("flowdata/", 'linearize')
+
+cutoffs <- c(2500, 2500)
+channels <- list(CD45=flow_file@exprs[,14], CD79b=flow_file@exprs[,11]) 
+
+print(dichotomize(channels, cutoffs))
 dim(E)
 E[1:10,]#Look at the first 10 rows (cells) of E
 f1@description#Study all the 'keyword' information store in the file

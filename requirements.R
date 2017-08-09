@@ -14,6 +14,5 @@ install_pak(packages)
 
 # BIOCONDUCTOR packages
 source("https://bioconductor.org/biocLite.R")
-biocLite("flowCore")
-biocLite("flowQ")
-biocLite("flowViz")
+biocLite()
+biocLite(pkgs=c("flowCore", "flowQ", "flowViz"))

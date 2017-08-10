@@ -8,11 +8,12 @@ install_pak <- function(pkg){
   }
 }
 
-packages <- c("circlize")
+packages <- c("circlize", "psych")
 install_pak(packages)
 
 
 # BIOCONDUCTOR packages
 source("https://bioconductor.org/biocLite.R")
 biocLite()
-biocLite(pkgs=c("flowCore", "flowQ", "flowViz"))
+# biocLite(pkgs=c("flowCore", "flowQ", "flowViz"))
+biocLite(pkgs=c("flowCore"))

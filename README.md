@@ -1,6 +1,6 @@
 # Flow to Circos
 
-Basic functionality to create circos plot that show concurrent positivity on flow cytometry markers.
+Basic functionality to create circos plot that shows concurrent positivity of flow cytometry markers.
 
 Example output:
 

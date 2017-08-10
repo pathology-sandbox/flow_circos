@@ -1,33 +1,46 @@
 library(flowCore)
+library(stringr)
 library(psych)
 library(circlize)
 
 # Functions
 
 dichotomize <- function(channels, cutoffs){
-  markers <- names(channels)
-  binary_matrix <- list() 
-  for (i in 1:length(channels)){
-    binary_matrix[[markers[[i]]]] <- 1 * sapply(channels[[i]], function(x) x > cutoffs[i])
-    binary_matrix[[markers[[i]]]][binary_matrix[[markers[[i]]]] == 0] <- NA
+  mrkrs <- colnames(channels)
+  bin_mat <- list() 
+  for (i in 1:dim(channels)[2]) {
+    bin_mat[[mrkrs[i]]] <- 1 * sapply(channels[,i], function(x) x > cutoffs[i])
+    bin_mat[[mrkrs[i]]][bin_mat[[mrkrs[i]]] == 0] <- NA
   }
-  return(binary_matrix)
+  return(bin_mat)
 }
 
-
 # User input
-flow_file <- read.FCS("flowdata/Blo CLL Lo_02 K-L-_-19-79b-20-5BV-45-_-__002.fcs", 'linearize')
 flow_file <- read.FCS("flowdata/", 'linearize')
 
-cutoffs <- c(2500, 2500, 2500, 2500)
+# Capture mrkrs
+capture_vector <- c("KAPPA", "LAMBDA", "CD19", "CD79b", 
+                    "CD20", "CD5 BV 421", "CD45")
+channel_labels <- flow_file@parameters[[2]]
+index_labels <- list()
+indeces <- list()
+marker_index <- 1
+for (i in 1:length(channel_labels)) {
+  pattern <- paste(".*", channel_labels[i], ".*", sep = "")
+  capture_vector_index <- which(str_detect(pattern, capture_vector))
+  if (length(capture_vector_index) > 0) {
+    index_labels[[marker_index]] <- capture_vector[[capture_vector_index]]
+    indeces[[marker_index]] <- i
+    marker_index <- marker_index + 1
+  }
+}
 
-flow_file@description
+df <- sapply(indeces, function(x) flow_file@exprs[,x])
+colnames(df) <- index_labels
 
+channels<-as.list.data.frame(df)
 
-channels <- list(CD20=flow_file@exprs[,10],
-                 CD19=flow_file@exprs[,13],
-                 CD45=flow_file@exprs[,14], 
-                 CD79b=flow_file@exprs[,11]) 
+cutoffs <- c(2500, 2500, 2500, 2500, 2500, 2500, 2500)
 
 # Get data matrix
 bm <- dichotomize(channels, cutoffs)
